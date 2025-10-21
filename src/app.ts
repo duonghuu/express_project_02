@@ -1,5 +1,8 @@
 import express, { Application } from "express";
 import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
+import { jobQueue } from "@workers/queue";
 import helmet from "helmet";
 import morgan from "morgan";
 import router from "@routes/index"
@@ -10,6 +13,12 @@ dotenv.config();
 const app: Application = express();
 // Middleware
 app.use(helmet());             // helmet header
+// === Setup log file ===
+const logDir = path.join(process.cwd(), "logs");
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
+const logFile = path.join(logDir, "access.log");
+const logStream = fs.createWriteStream(logFile, { flags: "a" });
+app.use(morgan("combined", { stream: logStream }));
 app.use(morgan("dev"));        // log request to console
 app.use(express.json());
 
@@ -21,6 +30,7 @@ app.use("/", router);
 
     const port = process.env.PORT || 3000;
     app.listen(port, () => console.log(`🚀 Server running on port ${port}`));
+
   } catch (error) {
     console.error("❌ Database connection failed:", error);
     process.exit(1);
