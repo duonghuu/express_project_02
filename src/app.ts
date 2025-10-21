@@ -7,6 +7,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import router from "@routes/index"
 import { connectDB } from "@config/database";
+import { Product } from "@models/Product";
 
 dotenv.config();
 
@@ -27,7 +28,8 @@ app.use("/", router);
 (async () => {
   try {
     const db = await connectDB();
-
+    // const repo = db.getMongoRepository(Product);
+    // await repo.save({ name: 'Test', price: 100 });
     const port = process.env.PORT || 3000;
     app.listen(port, () => console.log(`🚀 Server running on port ${port}`));
 

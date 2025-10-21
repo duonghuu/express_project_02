@@ -1,14 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, ObjectIdColumn, Column, ObjectId } from "typeorm";
 
 @Entity("products")
 export class Product {
-    @PrimaryGeneratedColumn()
-    id!: number;
+    @ObjectIdColumn()
+    id!: ObjectId;
 
     @Column()
     name!: string;
 
-    @Column("decimal", { precision: 10, scale: 2 })
+    @Column()
     price!: number;
 
     @Column({ default: true })
