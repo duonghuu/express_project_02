@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ResponsysRepository } from "repositories/responsysRepository";
 
 export const ResponsysService = {
     authToken: null,
@@ -88,6 +89,9 @@ export const ResponsysService = {
     async register(body: any): Promise<any> {
         let result = await this.processContact(body.matchColumnName1, body.matchColumnName2, body.data);
         return result;
+    },
+    async create(data: any) {
+        return ResponsysRepository.create(data);
     },
 
 };

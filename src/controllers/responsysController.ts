@@ -1,6 +1,6 @@
 import { redis } from "@config/redis";
 import { ResponsysService } from "@services/responsysService";
-import { jobQueue } from "@workers/queue";
+import { responsysQueue } from "@workers/queue";
 import dayjs from "dayjs";
 import { Request, Response } from "express";
 import fs from "fs";
@@ -36,10 +36,9 @@ function formatName(str: string) {
 export const responsysController = {
     async handleRegister(req: Request, res: Response): Promise<void> {
         let json = req.body ? req.body.data : {};
-
         //check data
         if (!json.CUSTOMER_ID_ && !json.EMAIL_ADDRESS_ && !json.MOBILE_NUMBER_) {
-            res.send({ ok: false, message: 'Missing customer data' });
+            res.json({ ok: false, message: 'Missing customer data' });
             return;
         }
 
@@ -62,7 +61,7 @@ export const responsysController = {
             data.data.MIDDLE_NAME = format.MIDDLE_NAME ? format.MIDDLE_NAME : data.data.MIDDLE_NAME;
         }
 
-        //override
+        // //override
         if (json.CUSTOMER_ID_) {
             data.matchColumnName1 = 'CUSTOMER_ID_';
             data.matchColumnName2 = null;
@@ -80,7 +79,7 @@ export const responsysController = {
 
         let result = await ResponsysService.register(data);
 
-        responsysQueue.add({
+        responsysQueue.add('resapi_queue', {
             type: 'SYNC_LEAD',
             data: {
                 CUSTOMERID: json.CUSTOMER_ID_,
@@ -105,6 +104,82 @@ export const responsysController = {
             }
         });
 
-        res.send({ data: result });
+        res.json({ data: result });
     },
+    async handleSignupS2S(req: Request, res: Response): Promise<void> {
+        let json = req.body ? req.body.data : {};
+        //check data
+        if (!json.MOBILE_NUMBER_ && !json.CUSTOMER_ID_) {
+            res.json({ ok: false, message: 'MISSING_CUSTOMER_DATA' });
+            return;
+        }
+
+
+        let data = req.body;
+
+        if (json.CUSTOMER_ID_) {
+            data.matchColumnName1 = 'CUSTOMER_ID_';
+            data.matchColumnName2 = null;
+        }
+
+        else if (json.MOBILE_NUMBER_) {
+            data.matchColumnName1 = 'MOBILE_NUMBER_';
+            data.matchColumnName2 = null;
+        }
+        let result = await ResponsysService.register(data);
+        await ResponsysService.create(data);
+        res.json({ data: result });
+    },
+    async handleTriggerS2S(req: Request, res: Response): Promise<void> {
+        //check data
+        let json = req.body;
+
+        if (!json.event_name || !json.event_source) {
+            res.json({ ok: false, message: 'MISSING_EVENT_DATA' });
+            return;
+        }
+
+        else if (!json.customer_id && !json.email_address && !json.mobile_number) {
+            res.json({ ok: false, message: 'MISSING_CUSTOMER_DATA' });
+            return;
+        }
+
+        let activityData = {
+            activity: json.activity ? json.activity : json.event_name,
+            customer_id: json.customer_id,
+            email_address: json.email_address,
+            mobile_number: json.mobile_number,
+            user_id: json.user_id,
+            event_name: json.event_name,
+            app_source: json.event_source,
+            timestamp: new Date(),
+            params: json.params,
+        };
+
+        //if (json && json.event_source === 'FEOL_2.0') {
+        //  redis.xadd("tracking-stream", "*", "data", JSON.stringify(activityData));
+        //} else {
+        // redis.xadd("activity-stream", "*", "data", JSON.stringify(activityData));
+        //}
+        await responsysQueue.add('ADD_ACTIVITY', {
+            type: 'ADD_ACTIVITY',
+            data: activityData,
+        });
+        // let triggerData = {
+        //     //type: 'TRIGGER_EVENT',
+        //     event: json.event_name,
+        //     contact: {
+        //         customer_id: json.customer_id,
+        //         email_address: json.email_address,
+        //         mobile_number: json.mobile_number,
+        //     },
+        //     data: {
+        //         event_source: json.event_source,
+        //         ...json.params
+        //     }
+        // }
+        // redis.xadd("trigger-stream", "*", "data", JSON.stringify(triggerData));
+
+        res.json({ ok: true });
+    }
 };

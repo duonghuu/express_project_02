@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
-import { jobQueue } from "@workers/queue";
+import { responsysQueue } from "@workers/queue";
 import helmet from "helmet";
 import morgan from "morgan";
 import router from "@routes/index"

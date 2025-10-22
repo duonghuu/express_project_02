@@ -3,7 +3,7 @@ import { Worker } from "bullmq";
 import dayjs from "dayjs";
 import fs from "fs";
 const worker = new Worker(
-  "taskQueue",
+  "resapi_queue",
   async (job) => {
 
     const jobData = job.data;

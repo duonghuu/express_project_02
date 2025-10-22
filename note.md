@@ -1,0 +1,18 @@
+demo user call custom app register api with data
+custom app receive data and send to redis
+save user request to db
+
+===
+trigger_s2s
+call 2 trigger, activity
+===
+
+
+custom app receive request /responsys/register
+- responsysController::handleRegister
+- ResponsysService.register
+  - processContact
+    - callContactAPI
+      - CALL responsys api rest/api/v1.3/lists/${this.API_PROFILE_LIST}/members
+      - retry
+- add to queue

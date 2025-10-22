@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { Product } from "@models/Product"
+import { Responsys } from "@models/Responsys";
 
 let dataSource: DataSource | null = null;
 
@@ -17,7 +18,7 @@ export const connectDB = async (): Promise<DataSource> => {
         authSource: 'admin',
         synchronize: true, // auto sync entity → collection
         logging: false,
-        entities: [Product]
+        entities: [Product,Responsys]
         // migrations: ["src/database/migrations/*.ts"],
     });
 
