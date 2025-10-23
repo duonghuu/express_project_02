@@ -107,6 +107,7 @@ export const responsysController = {
         res.json({ data: result });
     },
     async handleSignupS2S(req: Request, res: Response): Promise<void> {
+        const endPoint = "responsys/signup_s2s";
         let json = req.body ? req.body.data : {};
         //check data
         if (!json.MOBILE_NUMBER_ && !json.CUSTOMER_ID_) {
@@ -127,10 +128,11 @@ export const responsysController = {
             data.matchColumnName2 = null;
         }
         let result = await ResponsysService.register(data);
-        await ResponsysService.create(data);
+        await ResponsysService.create({ endPoint, ...data });
         res.json({ data: result });
     },
     async handleTriggerS2S(req: Request, res: Response): Promise<void> {
+        const endPoint = "responsys/trigger_s2s";
         //check data
         let json = req.body;
 
@@ -165,6 +167,7 @@ export const responsysController = {
             type: 'ADD_ACTIVITY',
             data: activityData,
         });
+        await ResponsysService.create({ endPoint, ...activityData });
         // let triggerData = {
         //     //type: 'TRIGGER_EVENT',
         //     event: json.event_name,

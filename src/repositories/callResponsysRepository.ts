@@ -1,14 +1,14 @@
 import { connectDB } from '@config/database';
-import { Responsys } from '@models/Responsys';
+import { CallResponsys } from '@models/CallResponsys';
 import dayjs from 'dayjs';
 
-export const ResponsysRepository = {
+export const CallResponsysRepository = {
     async getRepo() {
         const db = await connectDB();
-        return db.getMongoRepository(Responsys);
+        return db.getMongoRepository(CallResponsys);
     },
 
-    async create(data: Partial<Responsys>) {
+    async create(data: Partial<CallResponsys>) {
         const repo = await this.getRepo();
         const result = await repo.insertOne({
             ...data,

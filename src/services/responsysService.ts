@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ResponsysRepository } from "repositories/responsysRepository";
+import { CallResponsysService } from "./callResponsysService";
 
 export const ResponsysService = {
     authToken: null,
@@ -61,12 +62,15 @@ export const ResponsysService = {
                 data: recordData
             };
 
-            let res = await axios(config);
-            result = res.data;
+            // uat: thay vi call api cua responsys thi se log vao db: table: CallResponsys
 
-            if (result.recordData && result.recordData.records && result.recordData.records.length) {
-                result = result.recordData.records[0];
-            }
+            // let res = await axios(config);
+            // result = res.data;
+
+            // if (result.recordData && result.recordData.records && result.recordData.records.length) {
+            //     result = result.recordData.records[0];
+            // }
+            const result = await CallResponsysService.create(config);
 
             console.log('callContactAPI :: success', result);
 
