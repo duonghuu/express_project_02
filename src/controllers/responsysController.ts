@@ -1,4 +1,5 @@
 import { redis } from "@config/redis";
+import { CallResponsysService } from "@services/callResponsysService";
 import { ResponsysService } from "@services/responsysService";
 import { responsysQueue } from "@workers/queue";
 import dayjs from "dayjs";
@@ -128,7 +129,7 @@ export const responsysController = {
             data.matchColumnName2 = null;
         }
         let result = await ResponsysService.register(data);
-        await ResponsysService.create({ endPoint, ...data });
+        // await ResponsysService.create({ endPoint, ...data });
         res.json({ data: result });
     },
     async handleTriggerS2S(req: Request, res: Response): Promise<void> {
@@ -167,7 +168,11 @@ export const responsysController = {
             type: 'ADD_ACTIVITY',
             data: activityData,
         });
-        await ResponsysService.create({ endPoint, ...activityData });
+        const endPointResponsys = `/rest/api/v1.3/folders/Banking/suppData/Activity_${activityData.activity}/members`;
+
+        await ResponsysService.create({ endPoint, endPointResponsys, ...activityData });
+        // add to DB
+        // await CallResponsysService.create({ endPoint, endPointResponsys, ...activityData });
         // let triggerData = {
         //     //type: 'TRIGGER_EVENT',
         //     event: json.event_name,
