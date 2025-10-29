@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const ResponsysService = {
     authToken: null,
-    endPoint: "https://example.responsys.com", // Replace with actual endpoint
+    endPoint: process.env.RESPONSYS_ENDPOINT, // Replace with actual endpoint
     API_PROFILE_LIST: 'Resp_Banking_Customers',
 
     getDate(dateStr: string) {
@@ -26,6 +26,7 @@ export const ResponsysService = {
         return result;
     },
     async callActivityAPI(isCustomer: boolean, activityName: any, data: any) {
+        console.log('callActivityAPI', process.env)
         //call responsys api
         let result = {};
 
@@ -86,7 +87,7 @@ export const ResponsysService = {
         try {
             const config = {
                 method: 'post',
-                url: `/rest/api/v1.3/folders/Banking/suppData/Activity_${data.activity}/members`,
+                url: `localhost:6000/rest/api/v1.3/folders/Banking/suppData/Activity_${data.activity}/members`,
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": null
@@ -151,7 +152,7 @@ export const ResponsysService = {
         try {
             const config = {
                 method: 'post',
-                url: `${this.endPoint}/rest/api/v1.3/lists/${this.API_PROFILE_LIST}/members`,
+                url: `http://localhost:6000/rest/api/v1.3/lists/${this.API_PROFILE_LIST}/members`,
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": this.authToken
@@ -160,14 +161,13 @@ export const ResponsysService = {
             };
 
             // uat: thay vi call api cua responsys thi se log vao db: table: CallResponsys
+            // const result2 = await CallResponsysService.create(config);
 
-            // let res = await axios(config);
-            // result = res.data;
-
-            // if (result.recordData && result.recordData.records && result.recordData.records.length) {
-            //     result = result.recordData.records[0];
-            // }
-            const result = await CallResponsysService.create(config);
+            let res = await axios(config);
+            result = res.data;
+            if (result.recordData && result.recordData.records && result.recordData.records.length) {
+                result = result.recordData.records[0];
+            }
 
             console.log('callContactAPI :: success', result);
 

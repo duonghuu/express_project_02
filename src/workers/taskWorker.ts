@@ -1,6 +1,9 @@
 import { redis } from "@config/redis";
 import { CallResponsysService } from "@services/callResponsysService";
 import { ResponsysService } from "@services/responsysService";
+import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
 import { Worker } from "bullmq";
 import dayjs from "dayjs";
 import fs from "fs";
@@ -31,16 +34,18 @@ const worker = new Worker(
           //   "http://localhost:3000/responsys/add_activity",
           //   data
           // );
-          let result = await ResponsysService.processActivity(true, data.activity, data);
-          // const config = {
-          //       method: 'post',
-          //       url: `/rest/api/v1.3/folders/Banking/suppData/Activity_${data.activity}/members`,
-          //       headers: {
-          //           "Content-Type": "application/json",
-          //           "Authorization": null
-          //       },
-          //       data
-          //   };
+          // let result = await ResponsysService.processActivity(true, data.activity, data);
+          const config = {
+            method: 'post',
+            url: `${process.env.RESPONSYS_ENDPOINT}/rest/api/v1.3/folders/Banking/suppData/Activity_${data.activity}/members`,
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": null
+            },
+            data
+          };
+          let res = await axios(config);
+          const result = res.data;
           // const result = await CallResponsysService.create(config);
 
           // Ghi log kết quả

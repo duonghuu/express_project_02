@@ -170,7 +170,7 @@ export const responsysController = {
         });
         const endPointResponsys = `/rest/api/v1.3/folders/Banking/suppData/Activity_${activityData.activity}/members`;
 
-        await ResponsysService.create({ endPoint, endPointResponsys, ...activityData });
+        // await ResponsysService.create({ endPoint, endPointResponsys, ...activityData });
         // add to DB
         // await CallResponsysService.create({ endPoint, endPointResponsys, ...activityData });
         // let triggerData = {
