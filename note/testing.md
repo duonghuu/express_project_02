@@ -1,8 +1,8 @@
 ## Date
 
-| Date  | Title                                 | Note |
-| ----- | ------------------------------------- | ---- |
-| 29/10 | #### test /responsys/signup_s2s 29/10 |      |
+| Date  | Title                                  | Note |
+| ----- | -------------------------------------- | ---- |
+| 29/10 | #### test /responsys/signup_s2s 29/10  |      |
 | 29/10 | #### test /responsys/trigger_s2s 29/10 |      |
 
 ## start service
@@ -18,6 +18,8 @@ trigger_s2s
     "activity": "Signup",
     "event_name": "Signup_FaceID",
     "event_source": "FEOL2.0",
+    "feol_account_id": "UserID123",
+    "feol_account_status": "inactive",
     "customer_id": null,
     "email_address": null,
     "mobile_number": "84982535185",
@@ -36,8 +38,8 @@ signup_s2s
   "updateOnMatch": null,
   "matchColumnName1": "CUSTOMER_ID_",
   "matchColumnName2": "MOBILE_NUMBER_",
-  "UserID": "UserID123",
-  "UserStatus": "1",
+  "feol_account_id": "UserID123",
+  "feol_account_status": "inactive",
   "data": {
     "CUSTOMER_ID_": "WBNHy2qPns2NM+rWRR4z9VyDBjxlpZLoU+F/rhcv+1w=",
     "MOBILE_NUMBER_": "84982535185",
@@ -58,6 +60,9 @@ signup_s2s
 - handleTriggerS2S => add to queue responsysQueue
 
 - worker lấy responsysQueue và call responsys_basic_demo
+
+
+
 
 
 

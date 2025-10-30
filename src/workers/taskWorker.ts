@@ -7,6 +7,12 @@ dotenv.config();
 import { Worker } from "bullmq";
 import dayjs from "dayjs";
 import fs from "fs";
+// import { connectDB } from "@config/database";
+(async () => {
+  // const db = await connectDB();
+
+
+})();
 const worker = new Worker(
   "resapi_queue",
   async (job) => {
@@ -46,7 +52,8 @@ const worker = new Worker(
           };
           let res = await axios(config);
           const result = res.data;
-          // const result = await CallResponsysService.create(config);
+          console.log(result)
+          const insertResult = await CallResponsysService.create(result);
 
           // Ghi log kết quả
           // fs.appendFileSync(

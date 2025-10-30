@@ -152,7 +152,7 @@ export const ResponsysService = {
         try {
             const config = {
                 method: 'post',
-                url: `http://localhost:6000/rest/api/v1.3/lists/${this.API_PROFILE_LIST}/members`,
+                url: `${process.env.RESPONSYS_ENDPOINT}/rest/api/v1.3/lists/${this.API_PROFILE_LIST}/members`,
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": this.authToken
@@ -165,6 +165,7 @@ export const ResponsysService = {
 
             let res = await axios(config);
             result = res.data;
+            const insertResult = await CallResponsysService.create(result);
             if (result.recordData && result.recordData.records && result.recordData.records.length) {
                 result = result.recordData.records[0];
             }
