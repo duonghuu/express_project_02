@@ -135,40 +135,42 @@ export const responsysController = {
     async handleTriggerS2S(req: Request, res: Response): Promise<void> {
         const endPoint = "responsys/trigger_s2s";
         //check data
-        let json = req.body;
+        let data = req.body;
 
-        if (!json.event_name || !json.event_source) {
+        if (!data.event_name || !data.event_source) {
             res.json({ ok: false, message: 'MISSING_EVENT_DATA' });
             return;
         }
 
-        else if (!json.customer_id && !json.email_address && !json.mobile_number) {
+        else if (!data.customer_id && !data.email_address && !data.mobile_number) {
             res.json({ ok: false, message: 'MISSING_CUSTOMER_DATA' });
             return;
         }
 
-        let activityData = {
-            activity: json.activity ? json.activity : json.event_name,
-            customer_id: json.customer_id,
-            email_address: json.email_address,
-            mobile_number: json.mobile_number,
-            user_id: json.user_id,
-            event_name: json.event_name,
-            app_source: json.event_source,
-            timestamp: new Date(),
-            params: json.params,
-        };
+        // let activityData = {
+        //     activity: json.activity ? json.activity : json.event_name,
+        //     customer_id: json.customer_id,
+        //     email_address: json.email_address,
+        //     mobile_number: json.mobile_number,
+        //     user_id: json.user_id,
+        //     event_name: json.event_name,
+        //     app_source: json.event_source,
+        //     timestamp: new Date(),
+        //     params: json.params,
+        // };
 
         //if (json && json.event_source === 'FEOL_2.0') {
         //  redis.xadd("tracking-stream", "*", "data", JSON.stringify(activityData));
         //} else {
         // redis.xadd("activity-stream", "*", "data", JSON.stringify(activityData));
         //}
-        await responsysQueue.add('ADD_ACTIVITY', {
-            type: 'ADD_ACTIVITY',
-            data: activityData,
+        data.timestamp = new Date();
+        await responsysQueue.add('ADD_ACTIVITY_TRIGGER', {
+            type: 'ADD_ACTIVITY_TRIGGER',
+            data
         });
-        const endPointResponsys = `/rest/api/v1.3/folders/Banking/suppData/Activity_${activityData.activity}/members`;
+
+        // const endPointResponsys = `/rest/api/v1.3/folders/Banking/suppData/Activity_${activityData.activity}/members`;
 
         // await ResponsysService.create({ endPoint, endPointResponsys, ...activityData });
         // add to DB
