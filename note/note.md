@@ -71,5 +71,15 @@ Test signup_s2s
 - Controller
 - Service
 - Save to DB
+===
+| _id | feol_account_id | feol_account_status | RIID_          | customer_id_lv1         | customer_id_lv2 |
+| --- | --------------- | ------------------- | -------------- | ----------------------- | --------------- |
+| xxx | feolID123       | inactive            | RIID_feolID123 | feolID123_hash_by_phone |                 |
+
+
+| _id | feol_account_id | feol_account_status | RIID_          | customer_id_lv1         | customer_id_lv2       |
+| --- | --------------- | ------------------- | -------------- | ----------------------- | --------------------- |
+| xxx | feolID123       | active              | RIID_feolID123 | feolID123_hash_by_phone | feolID123_hash_by_nid |
+
 
 

@@ -1,38 +1,10 @@
-import { redis } from "@config/redis";
-import { CallResponsysService } from "@services/callResponsysService";
+import { MKTADBService } from "@services/mktaDbService";
 import { ResponsysService } from "@services/responsysService";
+import { utils } from "@utils/index";
 import { responsysQueue } from "@workers/queue";
-import dayjs from "dayjs";
 import { Request, Response } from "express";
-import fs from "fs";
 import _ from "lodash";
 import { v4 as uuidv4 } from 'uuid';
-
-function formatName(str: string) {
-
-    str = str.replace(/  +/g, ' ');
-
-    let arrTemp = str.split(' ');
-
-    const objName: { LAST_NAME?: string; MIDDLE_NAME?: string; FIRST_NAME?: string } = {};
-    if (arrTemp.length > 0) {
-
-        objName['LAST_NAME'] = arrTemp[0];
-
-        if (arrTemp.length > 1) {
-            objName['FIRST_NAME'] = arrTemp[arrTemp.length - 1];
-        }
-
-        if (arrTemp.length > 2) {
-            arrTemp.splice(0, 1);
-            arrTemp.splice(arrTemp.length - 1, 1);
-            objName['MIDDLE_NAME'] = arrTemp.join(' ');
-        }
-    }
-
-
-    return objName;
-}
 
 export const responsysController = {
     async handleRegister(req: Request, res: Response): Promise<void> {
@@ -47,7 +19,7 @@ export const responsysController = {
         data.data = _.pick(data.data, ['CUSTOMER_ID_', 'EMAIL_ADDRESS_', 'MOBILE_NUMBER_', 'FIRST_NAME', 'MIDDLE_NAME', 'LAST_NAME', 'LEAD_SOURCE', 'MKT_CAMPAIGN', 'MKT_FORM', 'ZALO_ID']);
 
         if (json.FIRST_NAME && !json.LAST_NAME) {
-            let format = formatName(json.FIRST_NAME);
+            let format = utils.formatName(json.FIRST_NAME);
 
             data.data.FIRST_NAME = format.FIRST_NAME ? format.FIRST_NAME : data.data.FIRST_NAME;
             data.data.LAST_NAME = format.LAST_NAME ? format.LAST_NAME : data.data.LAST_NAME;
@@ -55,7 +27,7 @@ export const responsysController = {
         }
 
         else if (!json.FIRST_NAME && json.LAST_NAME) {
-            let format = formatName(json.LAST_NAME);
+            let format = utils.formatName(json.LAST_NAME);
 
             data.data.FIRST_NAME = format.FIRST_NAME ? format.FIRST_NAME : data.data.FIRST_NAME;
             data.data.LAST_NAME = format.LAST_NAME ? format.LAST_NAME : data.data.LAST_NAME;
@@ -108,7 +80,6 @@ export const responsysController = {
         res.json({ data: result });
     },
     async handleSignupS2S(req: Request, res: Response): Promise<void> {
-        const endPoint = "responsys/signup_s2s";
         let json = req.body ? req.body.data : {};
         //check data
         if (!json.MOBILE_NUMBER_ && !json.CUSTOMER_ID_) {
@@ -129,11 +100,20 @@ export const responsysController = {
             data.matchColumnName2 = null;
         }
         let result = await ResponsysService.register(data);
-        // await ResponsysService.create({ endPoint, ...data });
+        let insertData = {
+            ...data,
+            "RIID": `RIID_${data.feol_account_id}`,
+            "customer_id_lv1": `${data.data.CUSTOMER_ID_}`,
+        };
+
+        const existingItem = await MKTADBService.getItemByField("feol_account_id", data.feol_account_id);
+        if (!existingItem) {
+            await MKTADBService.create(insertData);
+        }
+
         res.json({ data: result });
     },
     async handleTriggerS2S(req: Request, res: Response): Promise<void> {
-        const endPoint = "responsys/trigger_s2s";
         //check data
         let data = req.body;
 
@@ -147,48 +127,11 @@ export const responsysController = {
             return;
         }
 
-        // let activityData = {
-        //     activity: json.activity ? json.activity : json.event_name,
-        //     customer_id: json.customer_id,
-        //     email_address: json.email_address,
-        //     mobile_number: json.mobile_number,
-        //     user_id: json.user_id,
-        //     event_name: json.event_name,
-        //     app_source: json.event_source,
-        //     timestamp: new Date(),
-        //     params: json.params,
-        // };
-
-        //if (json && json.event_source === 'FEOL_2.0') {
-        //  redis.xadd("tracking-stream", "*", "data", JSON.stringify(activityData));
-        //} else {
-        // redis.xadd("activity-stream", "*", "data", JSON.stringify(activityData));
-        //}
         data.timestamp = new Date();
         await responsysQueue.add('ADD_ACTIVITY_TRIGGER', {
             type: 'ADD_ACTIVITY_TRIGGER',
             data
         });
-
-        // const endPointResponsys = `/rest/api/v1.3/folders/Banking/suppData/Activity_${activityData.activity}/members`;
-
-        // await ResponsysService.create({ endPoint, endPointResponsys, ...activityData });
-        // add to DB
-        // await CallResponsysService.create({ endPoint, endPointResponsys, ...activityData });
-        // let triggerData = {
-        //     //type: 'TRIGGER_EVENT',
-        //     event: json.event_name,
-        //     contact: {
-        //         customer_id: json.customer_id,
-        //         email_address: json.email_address,
-        //         mobile_number: json.mobile_number,
-        //     },
-        //     data: {
-        //         event_source: json.event_source,
-        //         ...json.params
-        //     }
-        // }
-        // redis.xadd("trigger-stream", "*", "data", JSON.stringify(triggerData));
 
         res.json({ ok: true });
     }

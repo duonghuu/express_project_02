@@ -1,8 +1,8 @@
-import { Entity, ObjectIdColumn, Column, ObjectId } from "typeorm";
+import { ObjectId } from "mongodb";
+import { Entity, ObjectIdColumn } from "typeorm";
 
 @Entity("responsys")
 export class Responsys {
     @ObjectIdColumn()
     id!: ObjectId;
-
 }

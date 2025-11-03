@@ -19,3 +19,8 @@ trigger
 
 
 ADD_ACTIVITY_TRIGGER
+
+===
+### update mktadb
+input: trigger_s2s with activity is Esign
+

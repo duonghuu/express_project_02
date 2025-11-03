@@ -26,7 +26,6 @@ export const ResponsysService = {
         return result;
     },
     async callActivityAPI(isCustomer: boolean, activityName: any, data: any) {
-        console.log('callActivityAPI', process.env)
         //call responsys api
         let result = {};
 
@@ -87,7 +86,7 @@ export const ResponsysService = {
         try {
             const config = {
                 method: 'post',
-                url: `localhost:6000/rest/api/v1.3/folders/Banking/suppData/Activity_${data.activity}/members`,
+                url: `${process.env.RESPONSYS_ENDPOINT}/rest/api/v1.3/folders/Banking/suppData/Activity_${data.activity}/members`,
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": null
@@ -114,8 +113,6 @@ export const ResponsysService = {
         }
     },
     async callContactAPI(pk1: string, pk2: string, data: any): Promise<any> {
-        //call responsys api
-
         let result = null;
 
         let fieldNames = [];
@@ -160,21 +157,18 @@ export const ResponsysService = {
                 data: recordData
             };
 
-            // uat: thay vi call api cua responsys thi se log vao db: table: CallResponsys
-            // const result2 = await CallResponsysService.create(config);
-
             let res = await axios(config);
             result = res.data;
-            const insertResult = await CallResponsysService.create(result);
+            await CallResponsysService.create([config.url, result]);
             if (result.recordData && result.recordData.records && result.recordData.records.length) {
                 result = result.recordData.records[0];
             }
 
-            console.log('callContactAPI :: success', result);
+            // console.log('callContactAPI :: success', result);
 
         } catch (err: any) {
 
-            console.log('callContactAPI :: error', err);
+            // console.log('callContactAPI :: error', err);
 
             let errorData = err.response ? err.response.data : { message: "NO_RESPONSE_RETURN" };
 
@@ -187,7 +181,6 @@ export const ResponsysService = {
 
         return result;
     },
-
     async register(body: any): Promise<any> {
         let result = await this.processContact(body.matchColumnName1, body.matchColumnName2, body.data);
         return result;
