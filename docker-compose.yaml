@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["node", "dist/app.js"]
+    command: ["node", "-r", "tsconfig-paths/register", "dist/app.js"]
     ports:
       - "3000:3000"
     env_file:
@@ -13,8 +13,6 @@ services:
       - redis
       - mongo
     restart: always
-    networks:
-      - my-mkta-network
 
   redis:
     image: redis:latest
@@ -25,8 +23,6 @@ services:
     volumes:
       - ./data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf
-    networks:
-      - my-mkta-network
 
   redisinsight:
     image: redis/redisinsight:latest
@@ -35,8 +31,6 @@ services:
       - "5540:5540"
     depends_on:
       - redis
-    networks:
-      - my-mkta-network
 
   mongo:
     image: mongo:latest
@@ -49,8 +43,6 @@ services:
       - "27017:27017"
     volumes:
       - ./mongo_data:/data/db
-    networks:
-      - my-mkta-network
 
   mongo-express:
     image: mongo-express:latest
@@ -65,9 +57,3 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
     depends_on:
       - mongo
-    networks:
-      - my-mkta-network
-
-networks:
-  my-mkta-network:
-    external: true
