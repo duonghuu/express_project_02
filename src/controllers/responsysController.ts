@@ -87,7 +87,6 @@ export const responsysController = {
             return;
         }
 
-
         let data = req.body;
 
         if (json.CUSTOMER_ID_) {

@@ -1,4 +1,3 @@
-import axios from "axios";
 import { MKTADBRepository } from "repositories/mktadbRepository";
 
 export const MKTADBService = {

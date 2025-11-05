@@ -14,7 +14,8 @@ export const MKTADBRepository = {
             feol_account_status: data?.feol_account_status || "",
             RIID: data?.RIID || "",
             customer_id_lv1: data?.customer_id_lv1 || "",
-            customer_id_lv2: data?.customer_id_lv2 || ""
+            customer_id_lv2: data?.customer_id_lv2 || "",
+            created_time: new Date()
         };
         const result = await repo.insertOne({
             ...customData

@@ -1,4 +1,3 @@
-import axios from "axios";
 import { CallResponsysRepository } from "repositories/callResponsysRepository";
 
 export const CallResponsysService = {
