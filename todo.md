@@ -7,3 +7,13 @@ List task cho MKTA
 - Deploy + test lại flow 5 - 7/11
 - Xử lý kiểm tra điều kiện user level 2 thì gọi API responsys update database
 - Deploy + test lại flow 11 - 14/11
+
+
+
+
+
+
+
+# env production
+## build nodejs app with production mode in doeckerfile
+## move config redis mongo to .env
